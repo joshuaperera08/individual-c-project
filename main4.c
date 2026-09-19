@@ -125,6 +125,27 @@ void readString(const char *prompt, char *dest, int size)
         printf("  Name cannot be empty.\n");
     }
 }
+//formatting
+//turns for eg;- 56500.5 into 56,500.50
+void formatMoney(double amount, char *out)
+{
+    long long cents = (long long)(amount * 100.0 + 0.5);
+    long long whole = cents / 100;
+    int frac = (int)(cents % 100);
+    char digits[32];
+    int len, pos = 0, i;
 
+    sprintf(digits, "%lld", whole);
+    len = (int)strlen(digits);
+    for (i = 0; i < len; i++) {
+        if (i > 0 && (len - i) % 3 == 0) {
+            out[pos++] = ',';
+        }
+        out[pos++] = digits[i];
+    }
+    sprintf(out + pos, ".%02d", frac);
+}
+
+//bed handling
 
 
