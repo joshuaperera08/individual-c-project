@@ -380,5 +380,99 @@ void registerPatient(void)
     appendRecord(i);
     saveBeds();
 }
-
-
+//Bill ouput
+void printBill(int i)
+{
+    char base[32], sur[32], ward[32], gross[32], disc[40], fin[32];
+    int surPercent = (pUrgency[i] == 3) ? 50 : (pUrgency[i] == 2) ? 20 : 0;
+ 
+    formatMoney(pBase[i], base);
+    formatMoney(pSurcharge[i], sur);
+    formatMoney(pWardCost[i], ward);
+    formatMoney(pGross[i], gross);
+    if (pDiscount[i] > 0) {
+        disc[0] = '-';
+        formatMoney(pDiscount[i], disc + 1);
+    } else {
+        formatMoney(0.0, disc);
+    }
+    formatMoney(pFinal[i], fin);
+ 
+    printf("\n====================================================\n");
+    printf(" SMART HOSPITAL ADMISSION & BILL\n");
+    printf("----------------------------------------------------------------------------------------\n");
+    printf("Patient ID              : PAT-%d\n", idBase + i);
+    printf("Patient Name            : %s\n", pName[i]);
+    printf("Age                     : %d Years", pAge[i]);
+    if (pAge[i] < 5 || pAge[i] > 65) {
+        printf(" (15%% Subsidy Eligible)");
+    }
+    printf("\n");
+    printf("Specialty               : %s\n", specialtyName[pSpecialty[i]]);
+    if (pWard[i] >= 0) {
+        printf("Assigned Ward           : %s (Bed #%02d)\n", wardName[pWard[i]], pBed[i] + 1);
+    } else {
+        printf("Assigned Ward           : None (Outpatient / OPD)\n");
+    }
+    printf("Urgency Level           : Level %d (%s)\n", pUrgency[i], urgencyLabel[pUrgency[i]]);
+    printf("----------------------------------------------------------------------------------------\n");
+    printf("Base Consultation Fee   : LKR %s\n", base);
+    printf("Emergency Surcharge     : LKR %s (%d%%)\n", sur, surPercent);
+    printf("Ward Stay Cost (%d Days) : LKR %s\n", pDays[i], ward);
+    printf("----------------------------------------------------------------------------------------\n");
+    printf("Gross Total Bill        : LKR %s\n", gross);
+    printf("Age Subsidy Discount    : LKR %s (%d%%)\n", disc, pDiscount[i] > 0 ? 15 : 0);
+    printf("----------------------------------------------------------------------------------------\n");
+    printf("Final Payable Amount    : LKR %s\n", fin);
+    if (pWait[i] == 0.0) {
+        printf("Estimated Waiting Time  : 0.00 mins (Immediate Attention)\n");
+    } else {
+        printf("Estimated Waiting Time  : %.2f mins\n", pWait[i]);
+    }
+    printf("====================================================\n");
+}
+/* *****priority sorting
+ * Selection sort is done on an index array so the original registration order
+ * stays untouched. Higher urgency first.. ties keep registration order.
+ */
+void displayPriorityList(void)
+{
+    int order[MAX_PATIENTS];
+    int i, j, best, temp, k;
+ 
+    if (patientCount == 0) {
+        printf("\nNo patients registered yet.\n");
+        return;
+    }
+ 
+    for (i = 0; i < patientCount; i++) {
+        order[i] = i;
+    }
+ 
+    for (i = 0; i < patientCount - 1; i++) {
+        best = i;
+        for (j = i + 1; j < patientCount; j++) {
+            if (pUrgency[order[j]] > pUrgency[order[best]] ||
+                (pUrgency[order[j]] == pUrgency[order[best]] && order[j] < order[best])) {
+                best = j;
+            }
+        }
+        temp = order[i];
+        order[i] = order[best];
+        order[best] = temp;
+    }
+ 
+    printf("\n=========================== PATIENT PRIORITY LIST ===========================\n");
+    printf("%-5s %-10s %-22s %-4s %-10s %-22s %s\n",
+           "Rank", "ID", "Name", "Age", "Urgency", "Specialty", "Ward");
+    printf("---------------------------------------------------------------------------------\n");
+    for (i = 0; i < patientCount; i++) {
+        k = order[i];
+        printf("%-5d PAT-%-6d %-22.22s %-4d %-10s %-22.22s %s\n",
+               i + 1, idBase + k, pName[k], pAge[k], urgencyLabel[pUrgency[k]],
+               specialtyName[pSpecialty[k]],
+               pWard[k] >= 0 ? wardName[pWard[k]] : "OPD");
+    }
+    printf("=================================================================================\n");
+}
+ 
