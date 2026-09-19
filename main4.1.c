@@ -252,8 +252,55 @@ void freeBed(void)
     saveBeds();
     printf("Bed #%02d in %s is now available.\n", bed + 1, wardName[ward]);
 }
- 
 
+//calculations
+//waiting time of a patient
+double calcWaitTime(int spec)
+{
+    return queueCount[spec] * specialtyTime[spec];
+}
+
+//charge for patients of urgency 3
+double calcSurcharge(int urgency, double baseFee)
+{
+    if (urgency == 2) {
+        return baseFee * 0.20;
+    }
+    if (urgency == 3) {
+        return baseFee * 0.50;
+    }
+    return 0.0;
+}
+
+//charge if admitted in a ward
+double calcWardCost(int admitted, int ward, int days)
+{
+    if (!admitted) {
+        return 0.0;
+    }
+    return days * wardRate[ward];
+}
+
+//total gross bill
+double calcGrossTotal(double base, double surcharge, double wardCost)
+{
+    return base + surcharge + wardCost;
+}
+
+//check discount availability
+double calcDiscount(int age, double gross)
+{
+    if (age < 5 || age > 65) {
+        return gross * 0.15;
+    }
+    return 0.0;
+}
+
+//final bill
+double calcFinalAmount(double gross, double discount)
+{
+    return gross - discount;
+}
 
 
 
