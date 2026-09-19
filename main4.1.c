@@ -299,7 +299,7 @@ double calcDiscount(int age, double gross)
 //final bill
 double calcFinalAmount(double gross, double discount)
 {
-    return gross - discount;
+ return gross - discount;
 }
 
 
