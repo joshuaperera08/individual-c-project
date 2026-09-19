@@ -527,3 +527,41 @@ void generateReports(void)
     printf("4. Highest-paying patient : %s (LKR %s)\n", pName[top], money);
     printf("============================================================\n");
 }
+file handling ================= */
+ 
+void appendRecord(int i)
+{
+    FILE *fp = fopen(RECORDS_FILE, "a");
+ 
+    if (fp == NULL) {
+        printf("Warning: could not write %s\n", RECORDS_FILE);
+        return;
+    }
+    fprintf(fp, "PAT-%d | %s | Age %d | %s | %s | Bed %02d | Urgency %d | Days %d | "
+                "Base %.2f | Surcharge %.2f | WardCost %.2f | Gross %.2f | Discount %.2f | Final %.2f\n",
+            idBase + i, pName[i], pAge[i], specialtyName[pSpecialty[i]],
+            pWard[i] >= 0 ? wardName[pWard[i]] : "OPD",
+            pBed[i] + 1, pUrgency[i], pDays[i],
+            pBase[i], pSurcharge[i], pWardCost[i], pGross[i], pDiscount[i], pFinal[i]);
+    fclose(fp);
+}
+ 
+//Counts existing records so patient IDs keep growing across runs
+int countSavedRecords(void)
+{
+    FILE *fp = fopen(RECORDS_FILE, "r");
+    char line[512];
+    int count = 0;
+ 
+    if (fp == NULL) {
+        return 0;
+    }
+    while (fgets(line, sizeof(line), fp) != NULL) {
+        if (strchr(line, '\n') != NULL) {
+            count++;
+        }
+    }
+    fclose(fp);
+    return count;
+}
+ 
