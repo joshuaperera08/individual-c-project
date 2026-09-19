@@ -475,4 +475,55 @@ void displayPriorityList(void)
     }
     printf("=================================================================================\n");
 }
+
  
+// Rreports
+ 
+void generateReports(void)
+{
+    int urgencyCount[4] = {0, 0, 0, 0};
+    double totalRevenue = 0.0, totalDiscount = 0.0;
+    int i, w, b, occupied, top = -1;
+    char money[32];
+ 
+    if (patientCount == 0) {
+        printf("\nNo patients registered yet - nothing to report.\n");
+        return;
+    }
+ 
+    for (i = 0; i < patientCount; i++) {
+        urgencyCount[pUrgency[i]]++;
+        totalRevenue  += pFinal[i];
+        totalDiscount += pDiscount[i];
+        if (top == -1 || pFinal[i] > pFinal[top]) {
+            top = i;
+        }
+    }
+ 
+    printf("\n==================== PERFORMANCE REPORT ====================\n");
+    printf("1. Patients registered : %d\n", patientCount);
+    printf("     Level 1 (Normal)   : %d\n", urgencyCount[1]);
+    printf("     Level 2 (Urgent)   : %d\n", urgencyCount[2]);
+    printf("     Level 3 (Critical) : %d\n", urgencyCount[3]);
+ 
+    formatMoney(totalRevenue, money);
+    printf("2. Total revenue earned   : LKR %s\n", money);
+    formatMoney(totalDiscount, money);
+    printf("   Total discounts given  : LKR %s\n", money);
+ 
+    printf("3. Bed occupancy:\n");
+    for (w = 0; w < NUM_WARDS; w++) {
+        occupied = 0;
+        for (b = 0; b < wardCapacity[w]; b++) {
+            if (bedOccupancy[w][b] == 1) {
+                occupied++;
+            }
+        }
+        printf("     %-26s : %d/%d beds (%.1f%%)\n", wardName[w], occupied, wardCapacity[w],
+               100.0 * occupied / wardCapacity[w]);
+    }
+ 
+    formatMoney(pFinal[top], money);
+    printf("4. Highest-paying patient : %s (LKR %s)\n", pName[top], money);
+    printf("============================================================\n");
+}
