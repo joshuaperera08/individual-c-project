@@ -197,6 +197,42 @@ void saveBeds(void)
     fclose(fp);
 }
 // Returns the first free bed index in a ward, or -1 if the ward is full
+int findFreeBed(int ward)
+{
+    int b;
+    for (b = 0; b < wardCapacity[ward]; b++) {
+        if (bedOccupancy[ward][b] == 0) {
+            return b;
+        }
+    }
+    return -1;
+}
+
+//displaying bed availability
+void displayBedStatus(void)
+{
+    int w, b, occupied;
+ 
+    printf("\n==================== BED STATUS ====================\n");
+    printf("  ( - = Available, X = Occupied )\n");
+    for (w = 0; w < NUM_WARDS; w++) {
+        occupied = 0;
+        printf("\nWard %d: %s\n  ", w + 1, wardName[w]);
+        for (b = 0; b < wardCapacity[w]; b++) {
+            printf("[%02d:%c] ", b + 1, bedOccupancy[w][b] ? 'X' : '-');
+            if (bedOccupancy[w][b]) {
+                occupied++;
+            }
+            if ((b + 1) % 10 == 0 && b + 1 < wardCapacity[w]) {
+                printf("\n  ");
+            }
+        }
+        printf("\n  Occupied: %d / %d\n", occupied, wardCapacity[w]);
+    }
+    printf("====================================================\n");
+}
+ 
+
 
 
 
