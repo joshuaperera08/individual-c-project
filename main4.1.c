@@ -302,7 +302,83 @@ double calcFinalAmount(double gross, double discount)
  return gross - discount;
 }
 
-
-
+//patient intake
+void registerPatient(void)
+{
+    int i = patientCount;
+    int spec, admitted, ward = -1, bed = -1, days = 0, s;
+ 
+    if (patientCount >= MAX_PATIENTS) {
+        printf("\nPatient list is full (%d). Cannot register more today.\n", MAX_PATIENTS);
+        return;
+    }
+ 
+    printf("\n--- New Patient Registration ---\n");
+    readString("Patient Name: ", pName[i], NAME_LEN);
+    pAge[i]     = readInt("Patient Age (0-120): ", 0, 120);
+    pUrgency[i] = readInt("Triage Level (1 = Normal, 2 = Urgent, 3 = Critical): ", 1, 3);
+ 
+    printf("\nSpecialties:\n");
+    for (s = 0; s < NUM_SPECIALTIES; s++) {
+        printf("  %d. %s (%d/%d booked today)\n",
+               s + 1, specialtyName[s], queueCount[s], specialtyCap[s]);
+    }
+    spec = readInt("Specialty ID (1-4): ", 1, NUM_SPECIALTIES) - 1;
+ 
+    if (queueCount[spec] >= specialtyCap[spec]) {
+        printf("\nSorry, %s has reached its daily cap of %d patients.\n",
+               specialtyName[spec], specialtyCap[spec]);
+        return;
+    }
+ 
+    admitted = readInt("Admit to a ward? (1 = Yes, 0 = No): ", 0, 1);
+    if (admitted) {
+        while (1) {
+            ward = readInt("Ward ID (1-4, or 0 to register as outpatient): ", 0, NUM_WARDS) - 1;
+            if (ward < 0) {
+                admitted = 0;
+                break;
+            }
+            bed = findFreeBed(ward);
+            if (bed >= 0) {
+                break;
+            }
+            printf("  %s is full. Choose another ward.\n", wardName[ward]);
+        }
+        if (admitted) {
+            days = readInt("Days Admitted (1-365): ", 1, 365);
+        }
+    }
+ 
+    if (inputClosed) {
+        return;   // input ended mid-registration: discard it
+    }
+ 
+    // everything valid: store the record
+    pSpecialty[i] = spec;
+    pWard[i]      = admitted ? ward : -1;
+    pBed[i]       = admitted ? bed : -1;
+    pDays[i]      = admitted ? days : 0;
+ 
+    pWait[i] = calcWaitTime(spec);      // uses the queue BEFORE this patient
+    queueCount[spec]++;
+ 
+    if (admitted) {
+        bedOccupancy[ward][bed] = 1;
+    }
+ 
+    pBase[i]      = specialtyFee[spec];
+    pSurcharge[i] = calcSurcharge(pUrgency[i], pBase[i]);
+    pWardCost[i]  = calcWardCost(admitted, ward, days);
+    pGross[i]     = calcGrossTotal(pBase[i], pSurcharge[i], pWardCost[i]);
+    pDiscount[i]  = calcDiscount(pAge[i], pGross[i]);
+    pFinal[i]     = calcFinalAmount(pGross[i], pDiscount[i]);
+ 
+    patientCount++;
+ 
+    printBill(i);
+    appendRecord(i);
+    saveBeds();
+}
 
 
