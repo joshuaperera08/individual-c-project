@@ -147,5 +147,58 @@ void formatMoney(double amount, char *out)
 }
 
 //bed handling
+void initBeds(void)
+{
+    int w, b;
+    for (w = 0; w < NUM_WARDS; w++) {
+        for (b = 0; b < MAX_BEDS; b++) {
+            bedOccupancy[w][b] = 0;
+        }
+    }
+}
+
+// Loads beds_status.txt if it exists; otherwise all beds stay available.
+void loadBeds(void)
+{
+    FILE *fp = fopen(BEDS_FILE, "r");
+    int w, b, value;
+
+    if (fp == NULL) {
+        return;
+    }
+    for (w = 0; w < NUM_WARDS; w++) {
+        for (b = 0; b < wardCapacity[w]; b++) {
+            if (fscanf(fp, "%d", &value) != 1) {
+                fclose(fp);
+                return;
+            }
+            bedOccupancy[w][b] = (value != 0) ? 1 : 0;
+        }
+    }
+    fclose(fp);
+}
+
+// One line per ward, one 0/1 per bed
+void saveBeds(void)
+{
+    FILE *fp = fopen(BEDS_FILE, "w");
+    int w, b;
+
+    if (fp == NULL) {
+        printf("Warning: could not write %s\n", BEDS_FILE);
+        return;
+    }
+    for (w = 0; w < NUM_WARDS; w++) {
+        for (b = 0; b < wardCapacity[w]; b++) {
+            fprintf(fp, "%d ", bedOccupancy[w][b]);
+        }
+        fprintf(fp, "\n");
+    }
+    fclose(fp);
+}
+// Returns the first free bed index in a ward, or -1 if the ward is full
+
+
+
 
 
