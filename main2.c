@@ -141,6 +141,6 @@ void readString(const char *prompt, char *dest, int size)
         }
         printf("  Name cannot be empty.\n");
     }
-}git
+}
 
 
