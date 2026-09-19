@@ -231,6 +231,27 @@ void displayBedStatus(void)
     }
     printf("====================================================\n");
 }
+//Discharge patients,make beds free
+void freeBed(void)
+{
+    int ward, bed;
+ 
+    printf("\n--- Free a Bed (Discharge) ---\n");
+    ward = readInt("Ward ID (1-4): ", 1, NUM_WARDS) - 1;
+    bed  = readInt("Bed number: ", 1, wardCapacity[ward]) - 1;
+ 
+    if (inputClosed) {
+        return;
+    }
+ 
+    if (bedOccupancy[ward][bed] == 0) {
+        printf("That bed is already available.\n");
+        return;
+    }
+    bedOccupancy[ward][bed] = 0;
+    saveBeds();
+    printf("Bed #%02d in %s is now available.\n", bed + 1, wardName[ward]);
+}
  
 
 
