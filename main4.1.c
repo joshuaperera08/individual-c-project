@@ -527,7 +527,7 @@ void generateReports(void)
     printf("4. Highest-paying patient : %s (LKR %s)\n", pName[top], money);
     printf("============================================================\n");
 }
-file handling ================= */
+//file handling
  
 void appendRecord(int i)
 {
@@ -563,5 +563,44 @@ int countSavedRecords(void)
     }
     fclose(fp);
     return count;
+}
+
+int main(void)
+{
+    int choice;
+ 
+    initBeds();
+    loadBeds();
+    idBase = FIRST_PATIENT_NUMBER + countSavedRecords();
+ 
+    do {
+        printf("\n========== SMART HOSPITAL SYSTEM ==========\n");
+        printf(" 1. Register new patient\n");
+        printf(" 2. View bed status\n");
+        printf(" 3. View patients in priority order\n");
+        printf(" 4. Generate performance reports\n");
+        printf(" 5. Free a bed (discharge)\n");
+        printf(" 6. Exit\n");
+        printf("===========================================\n");
+        choice = readInt("Enter your choice (1-6): ", 1, 6);
+        if (inputClosed) {
+            printf("\nInput closed.\n");
+            choice = 6;
+        }
+ 
+        switch (choice) {
+            case 1: registerPatient();     break;
+            case 2: displayBedStatus();    break;
+            case 3: displayPriorityList(); break;
+            case 4: generateReports();     break;
+            case 5: freeBed();             break;
+            case 6:
+                saveBeds();
+                printf("\nBed status saved. Goodbye!\n");
+                break;
+        }
+    } while (choice != 6);
+ 
+    return 0;
 }
  
