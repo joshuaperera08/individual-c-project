@@ -29,7 +29,7 @@ const char *urgencyLabel[4] = {"", "Normal", "Urgent", "Critical"};
 
 int bedOccupancy[NUM_WARDS][MAX_BEDS];
 
-//global variables..
+//global arrays
 char   pName[MAX_PATIENTS][NAME_LEN];
 int    pAge[MAX_PATIENTS];
 int    pUrgency[MAX_PATIENTS];
@@ -51,7 +51,7 @@ int idBase = FIRST_PATIENT_NUMBER;
 int inputClosed = 0;
 
 
-
+//to help user input
 int  readInt(const char *prompt, int min, int max);
 void readString(const char *prompt, char *dest, int size);
 
